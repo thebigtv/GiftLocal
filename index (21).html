@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Luckies Food Ordering System</title>
+<style>
+body{
+font-family:Arial,sans-serif;
+background:#1b1b1b;
+color:white;
+margin:0;
+padding:20px;
+max-width:1000px;
+margin:auto;
+}
+h1{
+text-align:center;
+color:#f0a500;
+margin-bottom:10px;
+}
+.subtitle{
+text-align:center;
+color:#ccc;
+margin-bottom:30px;
+}
+.stats{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+gap:15px;
+margin-bottom:30px;
+}
+.stat{
+background:#2a2a2a;
+padding:20px;
+border-radius:12px;
+text-align:center;
+}
+.stat-number{
+font-size:32px;
+font-weight:bold;
+color:#f0a500;
+}
+.cards{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+gap:20px;
+}
+.card{
+background:#2a2a2a;
+padding:25px;
+border-radius:12px;
+}
+.card h2{
+margin-top:0;
+}
+.btn{
+display:block;
+text-align:center;
+background:#f0a500;
+color:black;
+text-decoration:none;
+padding:15px;
+border-radius:8px;
+font-weight:bold;
+margin-top:15px;
+}
+.coming-soon{
+opacity:0.6;
+}
+</style>
+</head>
+<body>
+<h1>LUCKIES FOOD ORDERING SYSTEM</h1>
+<p class="subtitle">Front of House & Kitchen Management</p>
+<div class="stats">
+<div class="stat">
+<div class="stat-number" id="ordersToday">-</div>
+<div>Active Orders</div>
+</div>
+<div class="stat">
+<div class="stat-number" id="newOrders">-</div>
+<div>New Orders</div>
+</div>
+<div class="stat">
+<div class="stat-number" id="readyOrders">-</div>
+<div>Ready Orders</div>
+</div>
+</div>
+<div class="cards">
+<div class="card">
+<h2>🍕 Front of House</h2>
+<p>Create and submit food orders.</p>
+<a class="btn" href="orders.html">OPEN ORDER SCREEN</a>
+</div>
+<div class="card">
+<h2>👨‍🍳 Kitchen Dashboard</h2>
+<p>View and manage active orders.</p>
+<a class="btn" href="kitchen.html">OPEN KITCHEN DASHBOARD</a>
+</div>
+<div class="card">
+<h2>📊 Statistics</h2>
+<p>Sales and order reporting.</p>
+<a class="btn" href="stats.html">OPEN STATISTICS</a>
+</div>
+<div class="card coming-soon">
+<h2>📋 Order History</h2>
+<p>Browse historical orders.</p>
+</div>
+</div>
+<script>
+const API_URL="https://script.google.com/macros/s/AKfycbzOTMR-SbXk8SN4Bt4XilbKktpF-i2Wg1J3VEYzS2ccw8hTcRmIH9U5EThVXr83Ae6B0g/exec";
+async function loadStats(){
+try{
+const response=await fetch(API_URL);
+const orders=await response.json();
+document.getElementById("ordersToday").textContent=orders.length;
+const newCount=orders.filter(o=>(o.status||"NEW")==="NEW").length;
+const readyCount=orders.filter(o=>o.status==="READY").length;
+document.getElementById("newOrders").textContent=newCount;
+document.getElementById("readyOrders").textContent=readyCount;
+}catch(err){
+console.error(err);
+}
+}
+loadStats();
+setInterval(loadStats,10000);
+</script>
+</body>
+</html>
