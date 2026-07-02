@@ -121,19 +121,26 @@ async function markOwned(itemId) {
 async function loadShops() {
   const select = document.getElementById('item-shop');
   try {
-    const res = await apiGet('shops');
-    if (!res.success || !res.data.length) {
-      select.innerHTML = `<option value="">No shops set up yet</option>`;
-      return;
-    }
-    shopsById = {};
-    res.data.forEach(shop => { shopsById[shop.ShopID] = shop.ShopName; });
+    let shopsData = sessionStorage.getItem('gl_shops');
 
-    select.innerHTML = res.data.map(shop =>
+    if (!shopsData) {
+      const res = await apiGet('shops');
+      if (!res.success || !res.data.length) {
+        select.innerHTML = `<option value="">No shops set up yet</option>`;
+        return;
+      }
+      shopsData = JSON.stringify(res.data);
+      sessionStorage.setItem('gl_shops', shopsData);
+    }
+
+    const shops = JSON.parse(shopsData);
+    shopsById = {};
+    shops.forEach(shop => { shopsById[shop.ShopID] = shop.ShopName; });
+
+    select.innerHTML = shops.map(shop =>
       `<option value="${escapeHtml(shop.ShopID)}">${escapeHtml(shop.ShopName)}</option>`
     ).join('');
 
-    // Re-render items now that shop names are available, if already loaded
     if (window.__lastItems) {
       renderItems(window.__lastItems.wanted, window.__lastItems.owned);
     }
