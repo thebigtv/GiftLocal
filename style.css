@@ -342,6 +342,26 @@ a.tag:focus-visible {
   margin-bottom: 6px;
 }
 
+.field--checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.field--checkbox input[type="checkbox"] {
+  width: auto;
+  margin-top: 3px;
+  flex-shrink: 0;
+}
+
+.field--checkbox label {
+  text-transform: none;
+  letter-spacing: normal;
+  font-size: 13.5px;
+  color: #D9E2DB;
+  margin-bottom: 0;
+}
+
 .field input,
 .field select {
   width: 100%;
