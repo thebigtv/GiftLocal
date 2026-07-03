@@ -58,8 +58,9 @@
 <script src="config.js"></script>
 <script src="app.js"></script>
 <script>
-const childId = getQueryParam('id');
+const token = getQueryParam('token');
 let shopsById = {};
+let currentChildId = null; // real ChildID, set once the list loads — needed for add/mark-owned calls
 
 function renderChildHead(child) {
   const el = document.getElementById('child-head');
@@ -150,19 +151,20 @@ async function loadShops() {
 }
 
 async function loadChild() {
-  if (!childId) {
-    document.getElementById('child-head').innerHTML = `<p class="empty-note">No child selected.</p>`;
+  if (!token) {
+    document.getElementById('child-head').innerHTML = `<p class="empty-note">No list selected.</p>`;
     return;
   }
 
   try {
-    const res = await apiGet('child', { id: childId });
+    const res = await apiGet('childByToken', { token: token });
 
     if (!res.success) {
       document.getElementById('child-head').innerHTML = `<p class="empty-note">${escapeHtml(res.error)}</p>`;
       return;
     }
 
+    currentChildId = res.data.child.ChildID;
     renderChildHead(res.data.child);
     window.__lastItems = { wanted: res.data.wanted, owned: res.data.owned };
     renderItems(res.data.wanted, res.data.owned);
@@ -179,6 +181,12 @@ document.getElementById('add-form').addEventListener('submit', async (e) => {
   const shopId = document.getElementById('item-shop').value;
   const addedBy = document.getElementById('item-added-by').value.trim();
 
+  if (!currentChildId) {
+    msg.textContent = 'List not loaded yet — please wait a moment and try again.';
+    msg.className = 'form-msg form-msg--error';
+    return;
+  }
+
   if (!name || !shopId) {
     msg.textContent = 'Please add an item name and choose a shop.';
     msg.className = 'form-msg form-msg--error';
@@ -189,7 +197,7 @@ document.getElementById('add-form').addEventListener('submit', async (e) => {
   msg.className = 'form-msg';
 
   try {
-    const res = await apiPost('addWanted', { childId, shopId, name, addedBy });
+    const res = await apiPost('addWanted', { childId: currentChildId, shopId, name, addedBy });
     if (res.success) {
       msg.textContent = 'Added to the list.';
       msg.className = 'form-msg form-msg--ok';
