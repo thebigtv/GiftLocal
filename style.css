@@ -277,6 +277,41 @@ a.tag:focus-visible {
   padding: 10px 2px;
 }
 
+/* ---------- Share block ---------- */
+
+.share-block {
+  background: var(--bg-soft);
+  border-radius: var(--radius);
+  padding: 20px 22px;
+  margin: 24px 0 40px;
+}
+
+.share-block__row {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.share-block__qr {
+  background: var(--paper);
+  padding: 8px;
+  border-radius: var(--radius);
+  display: block;
+}
+
+.share-block__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.share-block__actions .btn {
+  width: auto;
+  min-width: 140px;
+}
+
 /* ---------- Add form ---------- */
 
 .add-form {
