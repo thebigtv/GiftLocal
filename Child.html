@@ -32,6 +32,22 @@
     </div>
   </div>
 
+  <div class="add-form">
+    <p class="add-form__title">Email this list</p>
+    <form id="email-form">
+      <div class="field">
+        <label for="contact-email">Email address</label>
+        <input type="email" id="contact-email" required placeholder="you@example.com">
+      </div>
+      <div class="field field--checkbox">
+        <input type="checkbox" id="contact-consent">
+        <label for="contact-consent">Keep me updated about GiftLocal and local shop offers</label>
+      </div>
+      <button type="submit" class="btn btn--primary">Send me this list</button>
+      <p id="email-msg" class="form-msg"></p>
+    </form>
+  </div>
+
   <div class="columns">
     <div>
       <p class="column__label">Wanted</p>
@@ -267,193 +283,11 @@ document.getElementById('add-form').addEventListener('submit', async (e) => {
   }
 });
 
-loadShops();
-loadChild();
-</script>
-</body>
-</html>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Gift list — GiftLocal</title>
-<link rel="stylesheet" href="style.css">
-</head>
-<body>
-<div class="wrap">
-
-  <header class="site-header">
-    <a href="index.html" class="site-header__mark">GiftLocal</a>
-    <span class="site-header__place">Hexham</span>
-  </header>
-
-  <a href="index.html" class="back-link">&larr; All gift lists</a>
-
-  <div id="child-head">
-    <p class="empty-note">Loading…</p>
-  </div>
-
-  <div class="columns">
-    <div>
-      <p class="column__label">Wanted</p>
-      <div id="wanted-list" class="item-list"></div>
-    </div>
-    <div>
-      <p class="column__label">Owned</p>
-      <div id="owned-list" class="item-list"></div>
-    </div>
-  </div>
-
-  <div class="add-form">
-    <p class="add-form__title">Add something to the list</p>
-    <form id="add-form">
-      <div class="field">
-        <label for="item-name">Item</label>
-        <input type="text" id="item-name" required placeholder="e.g. Jellycat Peanut">
-      </div>
-      <div class="field">
-        <label for="item-shop">Shop</label>
-        <select id="item-shop" required>
-          <option value="">Loading shops…</option>
-        </select>
-      </div>
-      <div class="field">
-        <label for="item-added-by">Added by (optional)</label>
-        <input type="text" id="item-added-by" placeholder="e.g. Mum">
-      </div>
-      <button type="submit" class="btn btn--primary">Add to Wanted</button>
-      <p id="form-msg" class="form-msg"></p>
-    </form>
-  </div>
-
-</div>
-
-<script src="config.js"></script>
-<script src="app.js"></script>
-<script>
-const token = getQueryParam('token');
-let shopsById = {};
-let currentChildId = null; // real ChildID, set once the list loads — needed for add/mark-owned calls
-
-function renderChildHead(child) {
-  const el = document.getElementById('child-head');
-  el.innerHTML = `
-    <div class="child-head">
-      <h1 class="child-head__name">${escapeHtml(child.Name)}'s list</h1>
-      <span class="child-head__age">Age ${escapeHtml(child.Age)}</span>
-    </div>
-    <p class="child-head__interests">${escapeHtml(child.Interests || '')}</p>
-  `;
-}
-
-function itemCard(item, showMarkOwned) {
-  const shopName = shopsById[item.ShopID] || item.ShopID || 'Shop not set';
-  const button = showMarkOwned
-    ? `<button class="btn btn--ghost btn--small" data-mark-owned="${escapeHtml(item.ItemID)}">Mark as owned</button>`
-    : '';
-
-  return `
-    <div class="tag tag--item">
-      ${tagStringSvg()}
-      <div class="tag__item-name">${escapeHtml(item.Name)}</div>
-      <p class="tag__shop">${escapeHtml(shopName)}</p>
-      ${button}
-    </div>
-  `;
-}
-
-function renderItems(wanted, owned) {
-  const wantedEl = document.getElementById('wanted-list');
-  const ownedEl = document.getElementById('owned-list');
-
-  wantedEl.innerHTML = wanted.length
-    ? wanted.map(i => itemCard(i, true)).join('')
-    : `<p class="empty-note">Nothing on the list yet.</p>`;
-
-  ownedEl.innerHTML = owned.length
-    ? owned.map(i => itemCard(i, false)).join('')
-    : `<p class="empty-note">Nothing marked as owned yet.</p>`;
-
-  wantedEl.querySelectorAll('[data-mark-owned]').forEach(btn => {
-    btn.addEventListener('click', () => markOwned(btn.getAttribute('data-mark-owned')));
-  });
-}
-
-async function markOwned(itemId) {
-  try {
-    const res = await apiPost('markOwned', { itemId });
-    if (res.success) {
-      loadChild();
-    } else {
-      alert('Could not update that item: ' + res.error);
-    }
-  } catch (err) {
-    alert('Something went wrong marking that item as owned.');
-  }
-}
-
-async function loadShops() {
-  const select = document.getElementById('item-shop');
-  try {
-    let shopsData = sessionStorage.getItem('gl_shops');
-
-    if (!shopsData) {
-      const res = await apiGet('shops');
-      if (!res.success || !res.data.length) {
-        select.innerHTML = `<option value="">No shops set up yet</option>`;
-        return;
-      }
-      shopsData = JSON.stringify(res.data);
-      sessionStorage.setItem('gl_shops', shopsData);
-    }
-
-    const shops = JSON.parse(shopsData);
-    shopsById = {};
-    shops.forEach(shop => { shopsById[shop.ShopID] = shop.ShopName; });
-
-    select.innerHTML = shops.map(shop =>
-      `<option value="${escapeHtml(shop.ShopID)}">${escapeHtml(shop.ShopName)}</option>`
-    ).join('');
-
-    if (window.__lastItems) {
-      renderItems(window.__lastItems.wanted, window.__lastItems.owned);
-    }
-  } catch (err) {
-    select.innerHTML = `<option value="">Couldn't load shops</option>`;
-  }
-}
-
-async function loadChild() {
-  if (!token) {
-    document.getElementById('child-head').innerHTML = `<p class="empty-note">No list selected.</p>`;
-    return;
-  }
-
-  try {
-    const res = await apiGet('childByToken', { token: token });
-
-    if (!res.success) {
-      document.getElementById('child-head').innerHTML = `<p class="empty-note">${escapeHtml(res.error)}</p>`;
-      return;
-    }
-
-    currentChildId = res.data.child.ChildID;
-    renderChildHead(res.data.child);
-    window.__lastItems = { wanted: res.data.wanted, owned: res.data.owned };
-    renderItems(res.data.wanted, res.data.owned);
-
-  } catch (err) {
-    document.getElementById('child-head').innerHTML = `<p class="empty-note">Something went wrong loading this list.</p>`;
-  }
-}
-
-document.getElementById('add-form').addEventListener('submit', async (e) => {
+document.getElementById('email-form').addEventListener('submit', async (e) => {
   e.preventDefault();
-  const msg = document.getElementById('form-msg');
-  const name = document.getElementById('item-name').value.trim();
-  const shopId = document.getElementById('item-shop').value;
-  const addedBy = document.getElementById('item-added-by').value.trim();
+  const msg = document.getElementById('email-msg');
+  const email = document.getElementById('contact-email').value.trim();
+  const consent = document.getElementById('contact-consent').checked;
 
   if (!currentChildId) {
     msg.textContent = 'List not loaded yet — please wait a moment and try again.';
@@ -461,29 +295,28 @@ document.getElementById('add-form').addEventListener('submit', async (e) => {
     return;
   }
 
-  if (!name || !shopId) {
-    msg.textContent = 'Please add an item name and choose a shop.';
+  if (!email) {
+    msg.textContent = 'Please enter an email address.';
     msg.className = 'form-msg form-msg--error';
     return;
   }
 
-  msg.textContent = 'Adding…';
+  msg.textContent = 'Sending…';
   msg.className = 'form-msg';
 
   try {
-    const res = await apiPost('addWanted', { childId: currentChildId, shopId, name, addedBy });
+    const res = await apiPost('addContact', { email, childId: currentChildId, consentMarketing: consent });
     if (res.success) {
-      msg.textContent = 'Added to the list.';
+      msg.textContent = 'Sent! Check your inbox.';
       msg.className = 'form-msg form-msg--ok';
-      document.getElementById('item-name').value = '';
-      document.getElementById('item-added-by').value = '';
-      loadChild();
+      document.getElementById('contact-email').value = '';
+      document.getElementById('contact-consent').checked = false;
     } else {
-      msg.textContent = res.error || 'Could not add that item.';
+      msg.textContent = res.error || 'Could not send that email.';
       msg.className = 'form-msg form-msg--error';
     }
   } catch (err) {
-    msg.textContent = 'Something went wrong adding that item.';
+    msg.textContent = 'Something went wrong sending that email.';
     msg.className = 'form-msg form-msg--error';
   }
 });
