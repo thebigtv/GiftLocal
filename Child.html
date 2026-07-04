@@ -170,20 +170,26 @@ function renderItems(wanted, owned) {
     : `<p class="empty-note">Nothing marked as owned yet.</p>`;
 
   wantedEl.querySelectorAll('[data-mark-owned]').forEach(btn => {
-    btn.addEventListener('click', () => markOwned(btn.getAttribute('data-mark-owned')));
+    btn.addEventListener('click', () => {
+      btn.disabled = true;
+      btn.textContent = 'Marking…';
+      markOwned(btn.getAttribute('data-mark-owned'), btn);
+    });
   });
 }
 
-async function markOwned(itemId) {
+async function markOwned(itemId, btn) {
   try {
     const res = await apiPost('markOwned', { itemId });
     if (res.success) {
       loadChild();
     } else {
       alert('Could not update that item: ' + res.error);
+      if (btn) { btn.disabled = false; btn.textContent = 'Mark as owned'; }
     }
   } catch (err) {
     alert('Something went wrong marking that item as owned.');
+    if (btn) { btn.disabled = false; btn.textContent = 'Mark as owned'; }
   }
 }
 
@@ -246,6 +252,7 @@ async function loadChild() {
 document.getElementById('add-form').addEventListener('submit', async (e) => {
   e.preventDefault();
   const msg = document.getElementById('form-msg');
+  const submitBtn = e.target.querySelector('button[type="submit"]');
   const name = document.getElementById('item-name').value.trim();
   const shopId = document.getElementById('item-shop').value;
   const addedBy = document.getElementById('item-added-by').value.trim();
@@ -262,7 +269,9 @@ document.getElementById('add-form').addEventListener('submit', async (e) => {
     return;
   }
 
-  msg.textContent = 'Adding…';
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Adding…';
+  msg.textContent = '';
   msg.className = 'form-msg';
 
   try {
@@ -280,12 +289,16 @@ document.getElementById('add-form').addEventListener('submit', async (e) => {
   } catch (err) {
     msg.textContent = 'Something went wrong adding that item.';
     msg.className = 'form-msg form-msg--error';
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Add to Wanted';
   }
 });
 
 document.getElementById('email-form').addEventListener('submit', async (e) => {
   e.preventDefault();
   const msg = document.getElementById('email-msg');
+  const submitBtn = e.target.querySelector('button[type="submit"]');
   const email = document.getElementById('contact-email').value.trim();
   const consent = document.getElementById('contact-consent').checked;
 
@@ -301,7 +314,9 @@ document.getElementById('email-form').addEventListener('submit', async (e) => {
     return;
   }
 
-  msg.textContent = 'Sending…';
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Sending…';
+  msg.textContent = '';
   msg.className = 'form-msg';
 
   try {
@@ -318,6 +333,9 @@ document.getElementById('email-form').addEventListener('submit', async (e) => {
   } catch (err) {
     msg.textContent = 'Something went wrong sending that email.';
     msg.className = 'form-msg form-msg--error';
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Send me this list';
   }
 });
 
