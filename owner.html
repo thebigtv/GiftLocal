@@ -124,7 +124,7 @@ function itemCard(item) {
       ${tagStringSvg()}
       <div class="tag__item-name">${escapeHtml(item.Name)}</div>
       <p class="tag__shop">${escapeHtml(shopName)}</p>
-      <button class="btn btn--ghost btn--small" data-already-have="${escapeHtml(item.ItemID)}">I already have this</button>
+      <button class="btn btn--ghost btn--small" data-already-have="${escapeHtml(item.ItemID)}">I have this now</button>
     </div>
   `;
 }
@@ -152,11 +152,11 @@ async function markAlreadyHave(itemId, btn) {
       loadChild();
     } else {
       alert('Could not update that item: ' + res.error);
-      if (btn) { btn.disabled = false; btn.textContent = 'I already have this'; }
+      if (btn) { btn.disabled = false; btn.textContent = 'I have this now'; }
     }
   } catch (err) {
     alert('Something went wrong updating that item.');
-    if (btn) { btn.disabled = false; btn.textContent = 'I already have this'; }
+    if (btn) { btn.disabled = false; btn.textContent = 'I have this now'; }
   }
 }
 
