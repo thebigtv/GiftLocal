@@ -51,6 +51,10 @@
     </form>
   </div>
 
+  <footer class="site-footer">
+    <a href="#" id="staff-flip-link">Shop staff</a>
+  </footer>
+
 </div>
 
 <script src="config.js"></script>
@@ -202,6 +206,7 @@ async function loadChild() {
     }
 
     currentChildId = res.data.child.ChildID;
+    window.__lastChild = res.data.child;
     renderChildHead(res.data.child);
     setupShareBlock(res.data.child);
     window.__lastWanted = res.data.wanted;
@@ -258,6 +263,23 @@ document.getElementById('add-form').addEventListener('submit', async (e) => {
 
 loadShops();
 loadChild();
+
+document.getElementById('staff-flip-link').addEventListener('click', async (e) => {
+  e.preventDefault();
+  const pin = prompt('Staff PIN:');
+  if (!pin) return;
+
+  try {
+    const res = await apiGet('verifyStaffKey', { key: pin });
+    if (res.success && window.__lastChild && window.__lastChild.ShareToken) {
+      window.location.href = 'child.html?share=' + encodeURIComponent(window.__lastChild.ShareToken);
+    } else {
+      alert('Incorrect PIN.');
+    }
+  } catch (err) {
+    alert('Something went wrong checking the PIN.');
+  }
+});
 </script>
 </body>
 </html>
