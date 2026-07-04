@@ -388,6 +388,141 @@ a.tag:focus-visible {
 .form-msg--ok { color: var(--sage); }
 .form-msg--error { color: #E28A7D; }
 
+/* ---------- Homepage: hero ---------- */
+
+.hero {
+  padding: 20px 0 12px;
+}
+
+.hero__title {
+  font-family: 'Fraunces', serif;
+  font-weight: 700;
+  font-size: 40px;
+  line-height: 1.15;
+  color: var(--cream);
+  margin: 0 0 18px;
+  max-width: 16ch;
+}
+
+.hero__sub {
+  font-size: 16.5px;
+  line-height: 1.6;
+  color: #D9E2DB;
+  max-width: 52ch;
+  margin: 0 0 28px;
+}
+
+.hero__ctas {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+.hero__ctas .btn {
+  width: auto;
+}
+
+/* ---------- Homepage: how it works ---------- */
+
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin: 56px 0 60px;
+  padding-top: 40px;
+  border-top: 1px solid rgba(247, 243, 234, 0.14);
+}
+
+@media (max-width: 640px) {
+  .steps { grid-template-columns: 1fr; }
+}
+
+.steps__num {
+  font-family: 'Fraunces', serif;
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--gold);
+  border: 1.5px solid var(--gold);
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 0 14px;
+}
+
+.steps__title {
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  font-size: 18px;
+  color: var(--cream);
+  margin: 0 0 8px;
+}
+
+.steps__text {
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: #B7C4BA;
+  margin: 0;
+  max-width: 32ch;
+}
+
+/* ---------- Homepage: shops section ---------- */
+
+.shops-section {
+  margin-bottom: 60px;
+}
+
+.tag-grid--shops {
+  margin-top: 16px;
+}
+
+.tag--shop {
+  padding-bottom: 20px;
+}
+
+/* ---------- Homepage: get involved ---------- */
+
+.get-involved {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  padding-top: 40px;
+  border-top: 1px solid rgba(247, 243, 234, 0.14);
+  margin-bottom: 20px;
+}
+
+@media (max-width: 640px) {
+  .get-involved { grid-template-columns: 1fr; }
+}
+
+.get-involved__card {
+  background: var(--bg-soft);
+  border-radius: var(--radius);
+  padding: 24px 22px;
+}
+
+.get-involved__title {
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  font-size: 18px;
+  color: var(--cream);
+  margin: 0 0 8px;
+}
+
+.get-involved__text {
+  font-size: 14px;
+  line-height: 1.55;
+  color: #B7C4BA;
+  margin: 0 0 18px;
+}
+
+.get-involved__card .btn {
+  width: auto;
+}
+
 /* ---------- Reduced motion ---------- */
 
 @media (prefers-reduced-motion: reduce) {
