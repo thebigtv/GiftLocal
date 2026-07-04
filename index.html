@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GiftLocal — Hexham</title>
+<title>GiftLocal — gifts from shops down the road</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -14,52 +14,87 @@
     <span class="site-header__place">Hexham</span>
   </header>
 
-  <p class="intro">
-    One gift list per person, filled with things from shops down the road —
-    not another marketplace. Pick a name to see what's on their list.
-  </p>
+  <section class="hero">
+    <h1 class="hero__title">Gift lists, sourced from shops down the road.</h1>
+    <p class="hero__sub">
+      GiftLocal is one gift list for the people you love — built from real,
+      independent local shops instead of one big online marketplace.
+      No matter who it's for, or what's on it.
+    </p>
+    <div class="hero__ctas">
+      <a href="lists.html" class="btn btn--primary">View gift lists</a>
+      <a href="#get-involved" class="btn btn--ghost">Get involved</a>
+    </div>
+  </section>
 
-  <div id="tag-grid" class="tag-grid">
-    <p class="empty-note">Loading gift lists…</p>
-  </div>
+  <section class="steps">
+    <div class="steps__item">
+      <p class="steps__num">1</p>
+      <p class="steps__title">Make a list</p>
+      <p class="steps__text">One list per person, with items added from any participating local shop.</p>
+    </div>
+    <div class="steps__item">
+      <p class="steps__num">2</p>
+      <p class="steps__title">Share it</p>
+      <p class="steps__text">Send a link, a QR code, or an email — family and friends see one simple list.</p>
+    </div>
+    <div class="steps__item">
+      <p class="steps__num">3</p>
+      <p class="steps__title">Buy local</p>
+      <p class="steps__text">Every item points to a real shop nearby, not a warehouse miles away.</p>
+    </div>
+  </section>
+
+  <section class="shops-section">
+    <p class="column__label">Participating shops</p>
+    <div id="shop-grid" class="tag-grid tag-grid--shops">
+      <p class="empty-note">Loading shops…</p>
+    </div>
+  </section>
+
+  <section id="get-involved" class="get-involved">
+    <div class="get-involved__card">
+      <p class="get-involved__title">Have a list of your own?</p>
+      <p class="get-involved__text">Gift lists are currently set up individually — get in touch and we'll create yours.</p>
+      <a href="mailto:PASTE_YOUR_EMAIL_HERE?subject=GiftLocal%20-%20Create%20my%20list" class="btn btn--ghost">Get in touch</a>
+    </div>
+    <div class="get-involved__card">
+      <p class="get-involved__title">Run a local shop?</p>
+      <p class="get-involved__text">Join GiftLocal and appear on gift lists across the area.</p>
+      <a href="mailto:PASTE_YOUR_EMAIL_HERE?subject=GiftLocal%20-%20List%20my%20shop" class="btn btn--ghost">List your shop</a>
+    </div>
+  </section>
 
 </div>
 
 <script src="config.js"></script>
 <script src="app.js"></script>
 <script>
-async function loadChildren() {
-  const grid = document.getElementById('tag-grid');
+async function loadShops() {
+  const grid = document.getElementById('shop-grid');
 
   try {
-    const res = await apiGet('children');
+    const res = await apiGet('shops');
 
-    if (!res.success) {
-      grid.innerHTML = `<p class="empty-note">Couldn't load gift lists: ${escapeHtml(res.error)}</p>`;
+    if (!res.success || !res.data.length) {
+      grid.innerHTML = `<p class="empty-note">Shops coming soon.</p>`;
       return;
     }
 
-    if (!res.data.length) {
-      grid.innerHTML = `<p class="empty-note">No gift lists yet.</p>`;
-      return;
-    }
-
-    grid.innerHTML = res.data.map(child => `
-      <a class="tag" href="child.html?token=${encodeURIComponent(child.Token)}">
+    grid.innerHTML = res.data.map(shop => `
+      <div class="tag tag--shop">
         ${tagStringSvg()}
-        <div class="tag__name">${escapeHtml(child.Name)}</div>
-        <p class="tag__meta">Age ${escapeHtml(child.Age)}</p>
-        <hr class="tag__divider">
-        <p class="tag__footer">View list &rarr;</p>
-      </a>
+        <div class="tag__name">${escapeHtml(shop.ShopName)}</div>
+        <p class="tag__meta">${escapeHtml(shop.Town || '')}${shop.Category ? ' &middot; ' + escapeHtml(shop.Category) : ''}</p>
+      </div>
     `).join('');
 
   } catch (err) {
-    grid.innerHTML = `<p class="empty-note">Something went wrong loading gift lists. Check your API_URL in config.js.</p>`;
+    grid.innerHTML = `<p class="empty-note">Couldn't load shops right now.</p>`;
   }
 }
 
-loadChildren();
+loadShops();
 </script>
 </body>
 </html>
