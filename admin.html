@@ -116,7 +116,7 @@ async function loadChildren(key) {
     }
 
     grid.innerHTML = res.data.map(child => `
-      <a class="tag" href="child.html?token=${encodeURIComponent(child.Token)}">
+      <a class="tag" href="child.html?share=${encodeURIComponent(child.ShareToken)}">
         ${tagStringSvg()}
         <div class="tag__name">${escapeHtml(child.Name)}</div>
         <p class="tag__meta">Age ${escapeHtml(child.Age)}</p>
