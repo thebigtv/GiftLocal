@@ -19,9 +19,9 @@
   </div>
 
   <div id="share-block" class="share-block" style="display:none;">
-    <p class="column__label">Share this list</p>
+    <p class="column__label">Share your list</p>
     <div class="share-block__row">
-      <img id="qr-img" class="share-block__qr" alt="QR code linking to this gift list" width="140" height="140">
+      <img id="qr-img" class="share-block__qr" alt="QR code linking to your gift list" width="140" height="140">
       <div class="share-block__actions">
         <button id="copy-link-btn" type="button" class="btn btn--ghost btn--small">Copy link</button>
         <button id="native-share-btn" type="button" class="btn btn--primary btn--small" style="display:none;">Share</button>
@@ -75,11 +75,12 @@ function renderChildHead(child) {
 }
 
 function setupShareBlock(child) {
-  // Deliberately shares the ShareToken link, never the owner's own token —
-  // this page's own link must never be handed out.
-  if (!child.ShareToken) return;
+  // Shares the owner's OWN link — never the ShareToken. This link is
+  // already theirs to hold, so there's nothing sensitive in showing it
+  // back to them or letting them pass it on to family/friends themselves.
+  if (!token) return;
 
-  const shareUrl = window.location.origin + '/child.html?share=' + encodeURIComponent(child.ShareToken);
+  const shareUrl = window.location.origin + '/owner.html?token=' + encodeURIComponent(token);
   const qrImg = document.getElementById('qr-img');
   qrImg.src = 'https://api.qrserver.com/v1/create-qr-code/?size=280x280&data=' + encodeURIComponent(shareUrl);
 
