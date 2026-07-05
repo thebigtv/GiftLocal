@@ -24,6 +24,7 @@
       <img id="qr-img" class="share-block__qr" alt="QR code linking to your gift list" width="140" height="140">
       <div class="share-block__actions">
         <button id="copy-link-btn" type="button" class="btn btn--ghost btn--small">Copy link</button>
+        <a id="mailto-btn" href="#" class="btn btn--ghost btn--small" style="text-decoration:none;">Email link</a>
         <button id="native-share-btn" type="button" class="btn btn--primary btn--small" style="display:none;">Share</button>
         <p id="share-msg" class="form-msg"></p>
       </div>
@@ -83,6 +84,10 @@ function setupShareBlock(child) {
   const shareUrl = window.location.origin + '/owner.html?token=' + encodeURIComponent(token);
   const qrImg = document.getElementById('qr-img');
   qrImg.src = 'https://api.qrserver.com/v1/create-qr-code/?size=280x280&data=' + encodeURIComponent(shareUrl);
+
+  const subject = encodeURIComponent(child.Name + '\u2019s gift list on GiftLocal');
+  const body = encodeURIComponent('Here\u2019s the link to ' + child.Name + '\u2019s gift list:\n\n' + shareUrl);
+  document.getElementById('mailto-btn').href = 'mailto:?subject=' + subject + '&body=' + body;
 
   document.getElementById('share-block').style.display = 'block';
 
