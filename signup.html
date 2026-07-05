@@ -37,6 +37,14 @@
         <label for="signup-interests">Interests (optional)</label>
         <input type="text" id="signup-interests" placeholder="e.g. dinosaurs, drawing, football">
       </div>
+      <div class="field">
+        <label for="signup-email">Your email</label>
+        <input type="email" id="signup-email" required placeholder="you@example.com">
+      </div>
+      <div class="field field--checkbox">
+        <input type="checkbox" id="signup-consent">
+        <label for="signup-consent">Keep me updated about GiftLocal and local shop offers</label>
+      </div>
       <button type="submit" class="btn btn--primary">Create my list</button>
       <p id="signup-msg" class="form-msg"></p>
     </form>
@@ -63,9 +71,17 @@ document.getElementById('signup-form').addEventListener('submit', async (e) => {
   const name = document.getElementById('signup-name').value.trim();
   const age = document.getElementById('signup-age').value.trim();
   const interests = document.getElementById('signup-interests').value.trim();
+  const email = document.getElementById('signup-email').value.trim();
+  const consent = document.getElementById('signup-consent').checked;
 
   if (!name) {
     msg.textContent = 'Please enter a name.';
+    msg.className = 'form-msg form-msg--error';
+    return;
+  }
+
+  if (!email) {
+    msg.textContent = 'Please enter your email.';
     msg.className = 'form-msg form-msg--error';
     return;
   }
@@ -79,6 +95,13 @@ document.getElementById('signup-form').addEventListener('submit', async (e) => {
     const res = await apiPost('addChild', { name, age, interests });
 
     if (res.success) {
+      // Log the contact separately — doesn't need to succeed for signup to count
+      try {
+        await apiPost('logContact', { email, childId: res.data.ChildID, consentMarketing: consent });
+      } catch (logErr) {
+        // Non-critical — the list was created either way
+      }
+
       document.getElementById('signup-form').style.display = 'none';
       document.getElementById('signup-success').style.display = 'block';
     } else {
