@@ -39,18 +39,10 @@
 
   <div class="add-form">
     <p class="add-form__title">Email this list</p>
-    <form id="email-form">
-      <div class="field">
-        <label for="contact-email">Email address</label>
-        <input type="email" id="contact-email" required placeholder="you@example.com">
-      </div>
-      <div class="field field--checkbox">
-        <input type="checkbox" id="contact-consent">
-        <label for="contact-consent">Keep me updated about GiftLocal and local shop offers</label>
-      </div>
-      <button type="submit" class="btn btn--primary">Send me this list</button>
-      <p id="email-msg" class="form-msg"></p>
-    </form>
+    <p style="color:#B7C4BA; font-size:13.5px; margin: -6px 0 16px;">
+      Opens your own email app, ready to send.
+    </p>
+    <a id="mailto-btn" href="#" class="btn btn--primary" style="display:inline-block; text-decoration:none;">Email this list</a>
   </div>
 
   <div class="columns">
@@ -246,6 +238,7 @@ async function loadChild() {
     currentChildId = res.data.child.ChildID;
     renderChildHead(res.data.child);
     setupShareBlock(res.data.child.Name);
+    setupMailto(res.data.child.Name);
     window.__lastItems = { wanted: res.data.wanted, owned: res.data.owned };
     renderItems(res.data.wanted, res.data.owned);
 
@@ -300,49 +293,13 @@ document.getElementById('add-form').addEventListener('submit', async (e) => {
   }
 });
 
-document.getElementById('email-form').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const msg = document.getElementById('email-msg');
-  const submitBtn = e.target.querySelector('button[type="submit"]');
-  const email = document.getElementById('contact-email').value.trim();
-  const consent = document.getElementById('contact-consent').checked;
-
-  if (!currentChildId) {
-    msg.textContent = 'List not loaded yet — please wait a moment and try again.';
-    msg.className = 'form-msg form-msg--error';
-    return;
-  }
-
-  if (!email) {
-    msg.textContent = 'Please enter an email address.';
-    msg.className = 'form-msg form-msg--error';
-    return;
-  }
-
-  submitBtn.disabled = true;
-  submitBtn.textContent = 'Sending…';
-  msg.textContent = '';
-  msg.className = 'form-msg';
-
-  try {
-    const res = await apiPost('addContact', { email, childId: currentChildId, consentMarketing: consent });
-    if (res.success) {
-      msg.textContent = 'Sent! Check your inbox.';
-      msg.className = 'form-msg form-msg--ok';
-      document.getElementById('contact-email').value = '';
-      document.getElementById('contact-consent').checked = false;
-    } else {
-      msg.textContent = res.error || 'Could not send that email.';
-      msg.className = 'form-msg form-msg--error';
-    }
-  } catch (err) {
-    msg.textContent = 'Something went wrong sending that email.';
-    msg.className = 'form-msg form-msg--error';
-  } finally {
-    submitBtn.disabled = false;
-    submitBtn.textContent = 'Send me this list';
-  }
-});
+function setupMailto(childName) {
+  const mailtoBtn = document.getElementById('mailto-btn');
+  const shareUrl = window.location.href;
+  const subject = encodeURIComponent(childName + '\u2019s gift list on GiftLocal');
+  const body = encodeURIComponent('Here\u2019s the link to ' + childName + '\u2019s gift list:\n\n' + shareUrl);
+  mailtoBtn.href = 'mailto:?subject=' + subject + '&body=' + body;
+}
 
 loadShops();
 loadChild();
