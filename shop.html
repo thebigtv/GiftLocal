@@ -11,7 +11,7 @@
 
   <header class="site-header">
     <a href="index.html" class="site-header__mark">GiftLocal</a>
-    <span class="site-header__place">Shop staff</span>
+    <span class="site-header__place site-header__place--staff">Shop staff</span>
   </header>
 
   <div id="login-box" class="add-form" style="max-width: 360px;">
@@ -160,10 +160,18 @@ document.getElementById('add-child-form').addEventListener('submit', async (e) =
       msg.textContent = 'List created and live.';
       msg.className = 'form-msg form-msg--ok';
       const shareUrl = window.location.origin + '/owner.html?token=' + encodeURIComponent(res.data.Token);
+      const qrSrc = 'https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=' + encodeURIComponent(shareUrl);
       resultBox.innerHTML = `
-        <p class="empty-note" style="font-style:normal;">
-          <a href="${shareUrl}" target="_blank" rel="noopener" style="color: var(--gold);">${shareUrl}</a>
-        </p>
+        <div class="share-block" style="margin-top: 16px;">
+          <div class="share-block__row">
+            <img src="${qrSrc}" class="share-block__qr" width="140" height="140" alt="QR code for this list">
+            <div class="share-block__actions">
+              <p class="empty-note" style="font-style:normal; word-break:break-all;">
+                <a href="${shareUrl}" target="_blank" rel="noopener" style="color: var(--gold);">${shareUrl}</a>
+              </p>
+            </div>
+          </div>
+        </div>
       `;
       document.getElementById('new-name').value = '';
       document.getElementById('new-age').value = '';
